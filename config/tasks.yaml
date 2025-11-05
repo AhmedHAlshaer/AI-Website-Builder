@@ -1,0 +1,62 @@
+plan:
+  description: |
+    The user wants a website built. Analyze the request provided in "{customer_request}".
+    Create a plan that includes:
+    1. The chosen technology stack for the website (e.g., static HTML/CSS, Flask with Python backend, etc.), focusing on free and easily set up solutions.
+    2. A list of the pages or components needed (with brief details of each).
+    3. A list of specific files to create (e.g., HTML, CSS, JS, Python files) and their purpose in the project.
+    Present the plan in a structured format (for example, JSON or a clear list of bullet points).
+  expected_output: |
+    A clear plan (in JSON or bullet form) listing the tech stack, required pages/components, and file names with descriptions.
+  agent: team_lead
+
+develop_frontend:
+  description: |
+    Based on the plan, generate the frontend code for the website.
+    This includes the HTML for the pages and any necessary CSS (and JavaScript if needed).
+    Ensure that all required sections (as per the plan) are present (e.g., projects section, about section, contact form).
+    Provide the full content of each frontend file (e.g., HTML, CSS, JS) clearly marked by file name.
+  expected_output: |
+    Complete code for the frontend files, each labeled with its filename (for example, an HTML file and a CSS file).
+  agent: frontend_dev
+  context: [plan]
+
+develop_backend:
+  description: |
+    If the plan indicates that a backend or server functionality is required (e.g., to handle a contact form), generate the backend code.
+    Based on the plan and the frontend implementation, create a Python web application (for example, using Flask) or other necessary backend code.
+    Include routes or handlers for any interactive features (like form submissions).
+    Provide the content of all backend files (e.g., app.py for Flask, plus any other modules if needed).
+    If the plan indicates no backend is needed, explain why or provide minimal code to run the site.
+  expected_output: |
+    The backend code file(s) (such as a Flask app.py with routes, etc.), or a statement that no backend is required.
+  agent: backend_dev
+  context: [plan, develop_frontend]
+
+integrate_code:
+  description: |
+    Integrate the frontend and backend code into a runnable project structure.
+    Use the available file system tools to create a folder (e.g., "website") and populate it with the files from the plan:
+    - Create directories (like "website/templates" and "website/static") as needed.
+    - Write each file (HTML, CSS, JS, Python, etc.) with the content provided by the developers.
+    If files or directories already exist, handle this by overwriting or creating a new version to avoid errors.
+    After writing, confirm that all files are successfully created.
+  expected_output: |
+    Confirmation that the integration is complete, listing the files that were written and their paths.
+  agent: integrator
+  context: [plan, develop_frontend, develop_backend]
+
+test_run:
+  description: |
+    Perform a basic test of the generated website project.
+    Verify that all expected files exist in the "website" directory.
+    If a backend (server) is present, attempt to start it (or do a dry-run by importing the main module) to check for obvious errors.
+    Confirm that the homepage (or main page) can be accessed (for example, by simulating a request or using a test client).
+    If applicable, test the contact form function by simulating input.
+    Summarize the results of the test.
+  expected_output: |
+    A summary of testing results. It should confirm that the website files were generated and mention if the server started without issues.
+    If successful, include a note that the site is ready and instructions on how to run it (e.g., "python website/app.py").
+    If there are any problems, list the issues.
+  agent: tester
+  context: [plan, develop_frontend, develop_backend, integrate_code]
