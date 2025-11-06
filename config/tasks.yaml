@@ -5,10 +5,11 @@ plan:
     1. The chosen technology stack for the website (e.g., static HTML/CSS, Flask with Python backend, etc.), focusing on free and easily set up solutions.
     2. A list of the pages or components needed (with brief details of each).
     3. A list of specific files to create (e.g., HTML, CSS, JS, Python files) and their purpose in the project.
-    Present the plan in a structured format (for example, JSON or a clear list of bullet points).
+    Present the plan in a structured JSON format for easy parsing.
   expected_output: |
-    A clear plan (in JSON or bullet form) listing the tech stack, required pages/components, and file names with descriptions.
+    A clear plan in JSON format listing the tech stack, required pages/components, and file names with descriptions.
   agent: team_lead
+  output_file: plan.json
 
 develop_frontend:
   description: |
@@ -20,6 +21,7 @@ develop_frontend:
     Complete code for the frontend files, each labeled with its filename (for example, an HTML file and a CSS file).
   agent: frontend_dev
   context: [plan]
+  output_file: frontend_code.txt
 
 develop_backend:
   description: |
@@ -32,6 +34,7 @@ develop_backend:
     The backend code file(s) (such as a Flask app.py with routes, etc.), or a statement that no backend is required.
   agent: backend_dev
   context: [plan, develop_frontend]
+  output_file: backend_code.txt
 
 integrate_code:
   description: |
@@ -60,3 +63,4 @@ test_run:
     If there are any problems, list the issues.
   agent: tester
   context: [plan, develop_frontend, develop_backend, integrate_code]
+  output_file: test_results.txt

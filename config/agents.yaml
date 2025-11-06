@@ -6,6 +6,8 @@ team_lead:
   backstory: >
     A veteran web development team lead with experience in planning full-stack projects quickly and effectively.
   allow_delegation: false
+  verbose: true
+  max_iter: 15
 
 frontend_dev:
   role: >
@@ -15,6 +17,8 @@ frontend_dev:
   backstory: >
     A creative frontend specialist skilled in modern web technologies and design principles, tasked with implementing the visual aspects of the site.
   allow_delegation: false
+  verbose: true
+  max_iter: 15
 
 backend_dev:
   role: >
@@ -24,6 +28,8 @@ backend_dev:
   backstory: >
     A reliable backend engineer proficient in building and integrating server-side functionality securely and efficiently.
   allow_delegation: false
+  verbose: true
+  max_iter: 15
 
 integrator:
   role: >
@@ -33,6 +39,8 @@ integrator:
   backstory: >
     An organized engineer responsible for putting all parts together correctly, ensuring the final project structure is correct and ready to run.
   allow_delegation: false
+  verbose: true
+  max_iter: 15
 
 tester:
   role: >
@@ -42,3 +50,5 @@ tester:
   backstory: >
     A meticulous tester who ensures the final output is error-free and meets the specified requirements.
   allow_delegation: false
+  verbose: true
+  max_iter: 15
