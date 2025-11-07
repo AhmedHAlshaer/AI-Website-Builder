@@ -229,3 +229,116 @@ test_run:
   agent: tester
   context: [plan, develop_frontend, develop_backend, integrate_code]
   output_file: test_results.txt
+
+
+analyze_existing:
+  description: |
+    The user has an existing website in the 'website/' directory and wants to make changes.
+    
+    User's edit request: "{edit_request}"
+    
+    YOUR TASKS:
+    1. Use read_file and list_dir tools to explore the existing website structure
+    2. Read all relevant files (HTML, CSS, JavaScript, Python) to understand current implementation
+    3. Identify which files need to be MODIFIED (changed)
+    4. Identify which NEW files need to be CREATED (for new features)
+    5. Explain WHAT needs to change and WHY
+    
+    IMPORTANT: Don't just list file names - explain what currently exists and what needs to change.
+    
+    OUTPUT FORMAT:
+    Create a clear analysis report with this structure:
+    
+    === CURRENT WEBSITE STRUCTURE ===
+    List all existing files you found
+    
+    === FILES TO MODIFY ===
+    For each file that needs changes:
+    - File: website/path/to/file.html
+    - Current state: (brief description of what's in the file now)
+    - Changes needed: (detailed explanation of what to modify and why)
+    
+    === NEW FILES TO CREATE ===
+    For each new file needed:
+    - File: website/path/to/newfile.html
+    - Purpose: (why this file is needed)
+    - Content requirements: (what should be in it)
+    
+    === OVERALL CHANGE PLAN ===
+    Summarize the modifications needed to achieve the user's request.
+    
+    Be thorough, clear, and actionable. The editor agent will use this to write code.
+    
+  expected_output: |
+    A comprehensive text file containing:
+    - Complete list of existing files
+    - Detailed analysis of files to modify (with current state and required changes)
+    - List of new files to create (with purpose and requirements)
+    - Clear overall change plan
+    
+    Format should be easy to read and understand.
+    
+  agent: analyzer
+  output_file: analysis_report.txt
+
+
+plan_modifications:
+  description: |
+    Based on the analysis report, generate ALL the code needed to implement the user's requested changes.
+    
+    User's original request: "{edit_request}"
+    
+    REVIEW the analysis report from the previous task and implement ALL changes identified.
+    
+    CRITICAL INSTRUCTIONS:
+    
+    1. For MODIFIED files:
+       - Provide the COMPLETE updated file content (entire file, not just the changed parts)
+       - Don't just show snippets - the integrator needs the full file to overwrite
+    
+    2. For NEW files:
+       - Provide COMPLETE file content from scratch
+       - Mark them with [NEW FILE] tag
+    
+    3. Code quality requirements:
+       - Production-ready code (no placeholders, no TODO comments)
+       - Well-commented (explain what changed and why)
+       - Integrates seamlessly with existing code
+       - Modern, clean, and follows best practices
+    
+    4. OUTPUT FORMAT (MUST FOLLOW EXACTLY):
+       Use file markers for each file:
+       
+       === FILENAME: website/index.html ===
+       <!DOCTYPE html>
+       <html lang="en">
+       ... (COMPLETE file content) ...
+       </html>
+       
+       === FILENAME: website/contact.html === [NEW FILE]
+       <!DOCTYPE html>
+       ... (COMPLETE new file content) ...
+       </html>
+    
+    5. Technologies:
+       - HTML with proper DOCTYPE and structure
+       - CSS with responsive design
+       - JavaScript for interactivity (if needed)
+       - Python (Flask) for backend (if needed)
+    
+    Provide EVERYTHING the integrator needs to write the files successfully.
+    
+  expected_output: |
+    Complete code for all modified and new files, with clear file markers.
+    
+    Format:
+    - Each file preceded by "=== FILENAME: path/to/file ==="
+    - New files marked with "[NEW FILE]"
+    - Complete file contents (not snippets)
+    - Well-commented, production-ready code
+    
+    The integrator will parse this output and write files to disk.
+    
+  agent: editor
+  context: [analyze_existing]
+  output_file: modifications_code.txt
