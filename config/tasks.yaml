@@ -1,66 +1,231 @@
 plan:
   description: |
     The user wants a website built. Analyze the request provided in "{customer_request}".
-    Create a plan that includes:
+    
+    Create a comprehensive plan that includes:
     1. The chosen technology stack for the website (e.g., static HTML/CSS, Flask with Python backend, etc.), focusing on free and easily set up solutions.
     2. A list of the pages or components needed (with brief details of each).
-    3. A list of specific files to create (e.g., HTML, CSS, JS, Python files) and their purpose in the project.
-    Present the plan in a structured JSON format for easy parsing.
+    3. A complete file structure with specific files to create (e.g., HTML, CSS, JS, Python files) and their purpose in the project.
+    4. For each file, include its path relative to the project root (e.g., "website/index.html", "website/static/style.css").
+    
+    IMPORTANT OUTPUT FORMAT:
+    - Your output MUST be valid JSON that can be parsed
+    - Structure: {
+        "tech_stack": {"frontend": "...", "backend": "...", "other": "..."},
+        "pages": [{"name": "...", "description": "...", "file": "..."}],
+        "files": [
+          {"path": "website/index.html", "type": "html", "purpose": "..."},
+          {"path": "website/static/style.css", "type": "css", "purpose": "..."}
+        ]
+      }
+    - Ensure all paths use forward slashes
+    - Do not include any text outside the JSON object
+    
   expected_output: |
-    A clear plan in JSON format listing the tech stack, required pages/components, and file names with descriptions.
+    A valid JSON object containing:
+    - tech_stack: object with frontend, backend, and other technology choices
+    - pages: array of page objects with name, description, and file path
+    - files: array of file objects with path, type, and purpose
+    
+    The JSON must be properly formatted and parseable.
+    
   agent: team_lead
   output_file: plan.json
 
 develop_frontend:
   description: |
-    Based on the plan, generate the frontend code for the website.
-    This includes the HTML for the pages and any necessary CSS (and JavaScript if needed).
-    Ensure that all required sections (as per the plan) are present (e.g., projects section, about section, contact form).
-    Provide the full content of each frontend file (e.g., HTML, CSS, JS) clearly marked by file name.
+    Based on the plan in the previous task, generate complete frontend code for the website.
+    
+    This includes:
+    - HTML for all pages (with proper DOCTYPE, meta tags, and semantic structure)
+    - CSS for styling (responsive design, modern aesthetics)
+    - JavaScript if needed for interactivity
+    
+    IMPORTANT OUTPUT FORMAT:
+    For EACH file, use this exact format:
+    
+    === FILENAME: website/index.html ===
+    <!DOCTYPE html>
+    <html lang="en">
+    ... (complete file content) ...
+    </html>
+    
+    === FILENAME: website/static/style.css ===
+    /* Complete CSS content */
+    body { ... }
+    
+    Guidelines:
+    - Provide COMPLETE file contents (no placeholders or "TODO" comments)
+    - Include all necessary sections mentioned in the plan
+    - Use modern, responsive design practices
+    - Ensure all files are production-ready
+    - Include comments explaining key sections
+    - Make sure HTML files reference the correct CSS/JS file paths
+    
   expected_output: |
-    Complete code for the frontend files, each labeled with its filename (for example, an HTML file and a CSS file).
+    Complete frontend code with clear file markers.
+    Each file should be preceded by "=== FILENAME: path/to/file ===" header.
+    All code should be complete, properly formatted, and ready to use.
+    
   agent: frontend_dev
   context: [plan]
   output_file: frontend_code.txt
 
 develop_backend:
   description: |
-    If the plan indicates that a backend or server functionality is required (e.g., to handle a contact form), generate the backend code.
-    Based on the plan and the frontend implementation, create a Python web application (for example, using Flask) or other necessary backend code.
-    Include routes or handlers for any interactive features (like form submissions).
-    Provide the content of all backend files (e.g., app.py for Flask, plus any other modules if needed).
-    If the plan indicates no backend is needed, explain why or provide minimal code to run the site.
+    Based on the plan and frontend implementation, determine if backend functionality is needed.
+    
+    If backend is required (e.g., for form submissions, API endpoints):
+    - Generate a Python web application (Flask or similar)
+    - Include all necessary routes and handlers
+    - Add proper error handling and validation
+    - Include requirements.txt if dependencies are needed
+    
+    If NO backend is required:
+    - Explicitly state "NO BACKEND REQUIRED"
+    - Optionally provide a simple Python HTTP server script for local testing
+    
+    IMPORTANT OUTPUT FORMAT:
+    For EACH file, use this exact format:
+    
+    === FILENAME: website/app.py ===
+    from flask import Flask, render_template, request
+    ... (complete file content) ...
+    
+    === FILENAME: website/requirements.txt ===
+    flask==2.3.0
+    ... (other dependencies) ...
+    
+    Guidelines:
+    - Provide COMPLETE, runnable code (no placeholders)
+    - Include all imports and error handling
+    - Follow security best practices (CSRF protection, input validation)
+    - Add comments explaining key logic
+    - Ensure the server can start without errors
+    
   expected_output: |
-    The backend code file(s) (such as a Flask app.py with routes, etc.), or a statement that no backend is required.
+    Either:
+    1. Complete backend code with file markers (=== FILENAME: ... ===) for each file, OR
+    2. A clear statement "NO BACKEND REQUIRED" with optional simple server script
+    
+    If backend code is provided, it must be complete and runnable.
+    
   agent: backend_dev
   context: [plan, develop_frontend]
   output_file: backend_code.txt
-
+b
 integrate_code:
   description: |
-    Integrate the frontend and backend code into a runnable project structure.
-    Use the available file system tools to create a folder (e.g., "website") and populate it with the files from the plan:
-    - Create directories (like "website/templates" and "website/static") as needed.
-    - Write each file (HTML, CSS, JS, Python, etc.) with the content provided by the developers.
-    If files or directories already exist, handle this by overwriting or creating a new version to avoid errors.
-    After writing, confirm that all files are successfully created.
+    Integrate the frontend and backend code into a runnable project structure on the file system.
+    
+    STEP-BY-STEP PROCESS:
+    
+    1. PARSE THE INPUTS:
+       - Read the plan.json to understand the file structure
+       - Parse frontend_code.txt to extract files (look for "=== FILENAME: ... ===" markers)
+       - Parse backend_code.txt to extract files (look for "=== FILENAME: ... ===" markers)
+    
+    2. CREATE DIRECTORY STRUCTURE:
+       - Use make_dir tool to create "website" directory
+       - Use make_dir to create all subdirectories (e.g., "website/static", "website/templates")
+       - Tool format: {"path": "website/static", "create_parents": true}
+    
+    3. WRITE FILES:
+       - For each file extracted from frontend_code.txt and backend_code.txt:
+         - Use write_file tool with format: {"path": "website/index.html", "content": "...", "create_parents": true}
+         - Verify success after each write
+         - If a write fails, log the error and continue (don't retry endlessly)
+    
+    4. ERROR HANDLING:
+       - If a tool call fails 2 times in a row with same error, skip that file
+       - Keep track of successful vs. failed files
+       - DO NOT enter infinite retry loops
+    
+    5. VERIFICATION:
+       - After writing all files, use exists tool to verify key files were created
+       - Report success/failure counts
+    
+    CRITICAL REMINDERS:
+    - Always include create_parents parameter in write_file calls
+    - Extract file content between "=== FILENAME: X ===" and next "=== FILENAME:" or end of text
+    - Handle files without "===" markers by using the filename from the plan
+    - If you encounter the same error 2 times, STOP retrying that operation and move on
+    
   expected_output: |
-    Confirmation that the integration is complete, listing the files that were written and their paths.
+    A detailed integration report containing:
+    1. List of directories created
+    2. List of files successfully written (with paths)
+    3. List of any files that failed to write (with error reasons)
+    4. Summary: "Successfully integrated X/Y files"
+    5. Final status: "Integration complete" or "Integration completed with errors"
+    
+    The report should be clear and actionable.
+    
   agent: integrator
   context: [plan, develop_frontend, develop_backend]
 
 test_run:
   description: |
-    Perform a basic test of the generated website project.
-    Verify that all expected files exist in the "website" directory.
-    If a backend (server) is present, attempt to start it (or do a dry-run by importing the main module) to check for obvious errors.
-    Confirm that the homepage (or main page) can be accessed (for example, by simulating a request or using a test client).
-    If applicable, test the contact form function by simulating input.
-    Summarize the results of the test.
+    Perform comprehensive testing of the generated website project.
+    
+    TEST PROCEDURE:
+    
+    1. FILE EXISTENCE CHECK:
+       - Use exists tool to verify all expected files from the plan exist
+       - Check for: HTML files, CSS files, JS files, Python files (if backend)
+       - Report any missing files
+    
+    2. FILE CONTENT VALIDATION:
+       - Use read_file to check that files are not empty
+       - For HTML files: verify they contain DOCTYPE, <html>, <head>, <body> tags
+       - For CSS files: verify they contain valid CSS syntax (at least one rule)
+       - For Python files: verify they contain valid Python syntax (import statements, etc.)
+    
+    3. FILE REFERENCE VALIDATION:
+       - Check that HTML files reference CSS/JS files that actually exist
+       - Example: if index.html has <link href="static/style.css">, verify "website/static/style.css" exists
+    
+    4. BACKEND TESTING (if applicable):
+       - If app.py exists, check it has Flask imports
+       - Verify requirements.txt exists if backend is present
+       - Check that routes are defined
+    
+    5. GENERATE RUN INSTRUCTIONS:
+       - For static sites: "Open website/index.html in your browser"
+       - For Flask apps: "cd website && pip install -r requirements.txt && python app.py"
+       - Include any setup steps needed
+    
+    OUTPUT FORMAT:
+    
+    TEST RESULTS
+    ============
+    Status: [PASS / FAIL / PARTIAL]
+    
+    Files Verified:
+    ✓ website/index.html (exists, valid HTML)
+    ✓ website/static/style.css (exists, valid CSS)
+    ✗ website/app.py (MISSING - expected from plan)
+    
+    Issues Found:
+    - [List any problems]
+    
+    How to Run:
+    1. [Step by step instructions]
+    2. [Additional steps if needed]
+    
+    Requirements:
+    - [Any software needed: Python 3.x, browser, etc.]
+    
   expected_output: |
-    A summary of testing results. It should confirm that the website files were generated and mention if the server started without issues.
-    If successful, include a note that the site is ready and instructions on how to run it (e.g., "python website/app.py").
-    If there are any problems, list the issues.
+    A comprehensive test report with:
+    - Overall status (PASS/FAIL/PARTIAL)
+    - Detailed list of verified files with checkmarks/crosses
+    - List of any issues found
+    - Clear, step-by-step instructions to run the website
+    - Any setup requirements or dependencies
+    
+    The report should be clear enough for a non-technical user to follow.
+    
   agent: tester
   context: [plan, develop_frontend, develop_backend, integrate_code]
   output_file: test_results.txt
