@@ -72,7 +72,7 @@ integrator:
     5. Report completion status with file counts
   allow_delegation: false
   verbose: true
-  max_iter: 8
+  max_iter: 20
 
 tester:
   role: >

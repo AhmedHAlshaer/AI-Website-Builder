@@ -1,118 +1,115 @@
-plan:
+analyze_existing:
   description: |
-    The user wants a website built. Analyze the request provided in "{customer_request}".
+    The user has an existing website in the 'website/' directory and wants to make changes.
     
-    Create a comprehensive plan that includes:
-    1. The chosen technology stack for the website (e.g., static HTML/CSS, Flask with Python backend, etc.), focusing on free and easily set up solutions.
-    2. A list of the pages or components needed (with brief details of each).
-    3. A complete file structure with specific files to create (e.g., HTML, CSS, JS, Python files) and their purpose in the project.
-    4. For each file, include its path relative to the project root (e.g., "website/index.html", "website/static/style.css").
+    User's edit request: "{edit_request}"
     
-    IMPORTANT OUTPUT FORMAT:
-    - Your output MUST be valid JSON that can be parsed
-    - Structure: {
-        "tech_stack": {"frontend": "...", "backend": "...", "other": "..."},
-        "pages": [{"name": "...", "description": "...", "file": "..."}],
-        "files": [
-          {"path": "website/index.html", "type": "html", "purpose": "..."},
-          {"path": "website/static/style.css", "type": "css", "purpose": "..."}
-        ]
-      }
-    - Ensure all paths use forward slashes
-    - Do not include any text outside the JSON object
+    YOUR TASKS:
+    1. Use read_file and list_dir tools to explore the existing website structure
+    2. Read all relevant files (HTML, CSS, JavaScript, Python) to understand current implementation
+    3. Identify which files need to be MODIFIED (changed)
+    4. Identify which NEW files need to be CREATED (for new features)
+    5. Explain WHAT needs to change and WHY
+    
+    IMPORTANT: Don't just list file names - explain what currently exists and what needs to change.
+    
+    OUTPUT FORMAT:
+    Create a clear analysis report with this structure:
+    
+    === CURRENT WEBSITE STRUCTURE ===
+    List all existing files you found
+    
+    === FILES TO MODIFY ===
+    For each file that needs changes:
+    - File: website/path/to/file.html
+    - Current state: (brief description of what's in the file now)
+    - Changes needed: (detailed explanation of what to modify and why)
+    
+    === NEW FILES TO CREATE ===
+    For each new file needed:
+    - File: website/path/to/newfile.html
+    - Purpose: (why this file is needed)
+    - Content requirements: (what should be in it)
+    
+    === OVERALL CHANGE PLAN ===
+    Summarize the modifications needed to achieve the user's request.
+    
+    Be thorough, clear, and actionable. The editor agent will use this to write code.
     
   expected_output: |
-    A valid JSON object containing:
-    - tech_stack: object with frontend, backend, and other technology choices
-    - pages: array of page objects with name, description, and file path
-    - files: array of file objects with path, type, and purpose
+    A comprehensive text file containing:
+    - Complete list of existing files
+    - Detailed analysis of files to modify (with current state and required changes)
+    - List of new files to create (with purpose and requirements)
+    - Clear overall change plan
     
-    The JSON must be properly formatted and parseable.
+    Format should be easy to read and understand.
     
-  agent: team_lead
-  output_file: plan.json
+  agent: analyzer
+  output_file: analysis_report.txt
 
-develop_frontend:
-  description: |
-    Based on the plan in the previous task, generate complete frontend code for the website.
-    
-    This includes:
-    - HTML for all pages (with proper DOCTYPE, meta tags, and semantic structure)
-    - CSS for styling (responsive design, modern aesthetics)
-    - JavaScript if needed for interactivity
-    
-    IMPORTANT OUTPUT FORMAT:
-    For EACH file, use this exact format:
-    
-    === FILENAME: website/index.html ===
-    <!DOCTYPE html>
-    <html lang="en">
-    ... (complete file content) ...
-    </html>
-    
-    === FILENAME: website/static/style.css ===
-    /* Complete CSS content */
-    body { ... }
-    
-    Guidelines:
-    - Provide COMPLETE file contents (no placeholders or "TODO" comments)
-    - Include all necessary sections mentioned in the plan
-    - Use modern, responsive design practices
-    - Ensure all files are production-ready
-    - Include comments explaining key sections
-    - Make sure HTML files reference the correct CSS/JS file paths
-    
-  expected_output: |
-    Complete frontend code with clear file markers.
-    Each file should be preceded by "=== FILENAME: path/to/file ===" header.
-    All code should be complete, properly formatted, and ready to use.
-    
-  agent: frontend_dev
-  context: [plan]
-  output_file: frontend_code.txt
 
-develop_backend:
+
+plan_modifications:
   description: |
-    Based on the plan and frontend implementation, determine if backend functionality is needed.
+    Based on the analysis report, generate ALL the code needed to implement the user's requested changes.
     
-    If backend is required (e.g., for form submissions, API endpoints):
-    - Generate a Python web application (Flask or similar)
-    - Include all necessary routes and handlers
-    - Add proper error handling and validation
-    - Include requirements.txt if dependencies are needed
+    User's original request: "{edit_request}"
     
-    If NO backend is required:
-    - Explicitly state "NO BACKEND REQUIRED"
-    - Optionally provide a simple Python HTTP server script for local testing
+    REVIEW the analysis report from the previous task and implement ALL changes identified.
     
-    IMPORTANT OUTPUT FORMAT:
-    For EACH file, use this exact format:
+    CRITICAL INSTRUCTIONS:
     
-    === FILENAME: website/app.py ===
-    from flask import Flask, render_template, request
-    ... (complete file content) ...
+    1. For MODIFIED files:
+       - Provide the COMPLETE updated file content (entire file, not just the changed parts)
+       - Don't just show snippets - the integrator needs the full file to overwrite
     
-    === FILENAME: website/requirements.txt ===
-    flask==2.3.0
-    ... (other dependencies) ...
+    2. For NEW files:
+       - Provide COMPLETE file content from scratch
+       - Mark them with [NEW FILE] tag
     
-    Guidelines:
-    - Provide COMPLETE, runnable code (no placeholders)
-    - Include all imports and error handling
-    - Follow security best practices (CSRF protection, input validation)
-    - Add comments explaining key logic
-    - Ensure the server can start without errors
+    3. Code quality requirements:
+       - Production-ready code (no placeholders, no TODO comments)
+       - Well-commented (explain what changed and why)
+       - Integrates seamlessly with existing code
+       - Modern, clean, and follows best practices
+    
+    4. OUTPUT FORMAT (MUST FOLLOW EXACTLY):
+       Use file markers for each file:
+       
+       === FILENAME: website/index.html ===
+       <!DOCTYPE html>
+       <html lang="en">
+       ... (COMPLETE file content) ...
+       </html>
+       
+       === FILENAME: website/contact.html === [NEW FILE]
+       <!DOCTYPE html>
+       ... (COMPLETE new file content) ...
+       </html>
+    
+    5. Technologies:
+       - HTML with proper DOCTYPE and structure
+       - CSS with responsive design
+       - JavaScript for interactivity (if needed)
+       - Python (Flask) for backend (if needed)
+    
+    Provide EVERYTHING the integrator needs to write the files successfully.
     
   expected_output: |
-    Either:
-    1. Complete backend code with file markers (=== FILENAME: ... ===) for each file, OR
-    2. A clear statement "NO BACKEND REQUIRED" with optional simple server script
+    Complete code for all modified and new files, with clear file markers.
     
-    If backend code is provided, it must be complete and runnable.
+    Format:
+    - Each file preceded by "=== FILENAME: path/to/file ==="
+    - New files marked with "[NEW FILE]"
+    - Complete file contents (not snippets)
+    - Well-commented, production-ready code
     
-  agent: backend_dev
-  context: [plan, develop_frontend]
-  output_file: backend_code.txt
+    The integrator will parse this output and write files to disk.
+    
+  agent: editor
+  context: [analyze_existing]
+  output_file: modifications_code.txt
 
 integrate_code:
   description: |
@@ -162,7 +159,7 @@ integrate_code:
     The report should be clear and actionable.
     
   agent: integrator
-  context: [plan, develop_frontend, develop_backend]
+  context: [analyze_existing, plan_modifications]
 
 test_run:
   description: |
@@ -227,7 +224,7 @@ test_run:
     The report should be clear enough for a non-technical user to follow.
     
   agent: tester
-  context: [plan, develop_frontend, develop_backend, integrate_code]
+  context: [analyze_existing, plan_modifications, integrate_code]
   output_file: test_results.txt
 
 

@@ -3,6 +3,8 @@ import os
 import shutil
 from builder.crew import SiteBuilderCrew
 from crewai import Agent, LLM, Task, Crew
+from builder.editor_crew import EditorCrew
+
 
 # Initialize LLM (similar to crew.py)
 model_name = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
@@ -145,22 +147,35 @@ def run_new_website_workflow(user_spec: str):
 def run_edit_website_workflow(edit_spec: str):
     """
     Run the workflow for EDITING an existing website
-    TODO: You need to implement this!
     """
-    print("\n🔧 EDIT MODE")
+    print("\n🔧 EDIT MODE")  # ✅ Add \n here
     print("="*60)
-    print("⚠️  Edit functionality is not yet implemented.")
-    print("This is where you would:")
-    print("  1. 📖 Analyze the existing website")
-    print("  2. 📝 Plan the modifications")
-    print("  3. ✏️  Apply the changes")
-    print("  4. ✅ Test the updated website")
-    print("\nFor now, this feature is coming soon!")
+    print("🚀 Starting website editing process...")
+    print("📋 This may take a few minutes. The crew will:")
+    print("   1. 📖 Analyze the existing website")
+    print("   2. 📝 Plan the modifications")
+    print("   3. ✏️  Apply the changes")
+    print("   4. ✅ Test the updated website")
+    print("\nPlease wait...\n")
+
+    crew_instance = EditorCrew()
+
+    try:
+        result = crew_instance.crew().kickoff(inputs = {"edit_request": edit_spec})
+    except Exception as e:
+        print("\n❌ An error occurred during editing:")  # ✅ "occurred"
+        print(e)
+        sys.exit(1)
+    print("\n" + "="*60)
+    print("🎉 EDITING COMPLETE")
     print("="*60)
+    if result:
+        print(result)
+    else:
+        print("Website editing completed. Your updated website is in the 'website/' directory.")
+    print("\n" + "="*60)
     
-    # TODO: Create SiteEditorCrew and run it here
-    # crew_instance = SiteEditorCrew()
-    # result = crew_instance.crew().kickoff(inputs={"edit_request": edit_spec})
+    
 
 
 def run():
